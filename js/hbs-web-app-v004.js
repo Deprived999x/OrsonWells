@@ -7,6 +7,45 @@ class HBSWebApp {
         this.validator = new HBSValidator(hbsSchema);
         // Load the debug helper if available
         this.debug = (typeof HBSDebugHelper !== 'undefined') ? HBSDebugHelper : null;
+        
+        // Initialize the UI when constructed
+        this.initUI();
+    }
+
+    /**
+     * Initialize the UI components and event handlers
+     */
+    initUI() {
+        // Set up event listeners for form changes
+        const form = document.getElementById('character-form');
+        if (form) {
+            form.addEventListener('change', () => this.generatePreview());
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.generatePreview();
+            });
+        } else {
+            console.error("Character form not found in the DOM");
+        }
+
+        // Setup menu toggles
+        const menuSections = document.querySelectorAll('.menu-section');
+        menuSections.forEach(section => {
+            const heading = section.querySelector('h3, h4');
+            const content = section.querySelector('.menu-content');
+            
+            if (heading && content) {
+                heading.addEventListener('click', () => {
+                    content.classList.toggle('hidden');
+                    heading.classList.toggle('expanded');
+                });
+            }
+        });
+
+        // Initial preview generation
+        this.generatePreview();
+        
+        console.log("HBS Web App UI initialized");
     }
 
     /**
@@ -476,3 +515,9 @@ class HBSWebApp {
 if (typeof module !== 'undefined') {
     module.exports = { HBSWebApp };
 }
+
+// Initialize the app when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.hbsApp = new HBSWebApp();
+    console.log("HBS Web App instance created");
+});
