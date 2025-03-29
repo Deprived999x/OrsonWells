@@ -4,296 +4,272 @@
  */
 class HBSWebApp {
     constructor() {
-        this.validator = new HBSValidator(hbsSchema);
+        // Load schema via fetch instead of DOM element
+        this.loadSchema()
+            .then(schema => {
+                this.schema = schema;
+                if (typeof HBSValidator !== 'undefined') {
+                    this.validator = new HBSValidator(schema);
+                }
+                // Initialize UI after schema loads
+                this.initUI();
+            })
+            .catch(error => {
+                console.error("Error loading schema:", error);
+                this.schema = {};
+                if (typeof HBSValidator !== 'undefined') {
+                    this.validator = new HBSValidator({});
+                }
+                this.initUI();
+            });
+        
         // Load the debug helper if available
         this.debug = (typeof HBSDebugHelper !== 'undefined') ? HBSDebugHelper : null;
-        
-        // Initialize the UI when constructed
-        this.initUI();
+    }
+
+    /**
+     * Load schema from JSON file
+     */
+    async loadSchema() {
+        try {
+            const response = await fetch('schema/hbs-schema-v004.json');
+            if (!response.ok) {
+                throw new Error(`Failed to fetch schema: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error("Error loading schema:", error);
+            return {};
+        }
     }
 
     /**
      * Initialize the UI components and event handlers
      */
     initUI() {
-        // Set up event listeners for form changes
-        const form = document.getElementById('character-form');
-        if (form) {
-            form.addEventListener('change', () => this.generatePreview());
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.generatePreview();
+        // Set up generate button
+        const generateBtn = document.getElementById('generate-btn');
+        if (generateBtn) {
+            generateBtn.addEventListener('click', () => this.generatePrompt());
+        }
+        
+        // Set up reset button
+        const resetBtn = document.getElementById('reset-btn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => this.resetForm());
+        }
+        
+        // Set up save button
+        const saveBtn = document.getElementById('save-btn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => this.saveCharacter());
+        }
+        
+        // Set up load file input
+        const loadFile = document.getElementById('load-file');
+        if (loadFile) {
+            loadFile.addEventListener('change', (e) => this.loadCharacter(e));
+        }
+        
+        // Set up character name input to enable save button when filled
+        const nameInput = document.getElementById('character-name');
+        if (nameInput) {
+            nameInput.addEventListener('input', () => {
+                const saveBtn = document.getElementById('save-btn');
+                if (saveBtn) {
+                    saveBtn.disabled = !nameInput.value.trim();
+                }
             });
-        } else {
-            console.error("Character form not found in the DOM");
         }
 
-        // Setup menu toggles
-        const menuSections = document.querySelectorAll('.menu-section');
-        menuSections.forEach(section => {
-            const heading = section.querySelector('h3, h4');
-            const content = section.querySelector('.menu-content');
-            
-            if (heading && content) {
-                heading.addEventListener('click', () => {
-                    content.classList.toggle('hidden');
-                    heading.classList.toggle('expanded');
-                });
-            }
-        });
-
-        // Initial preview generation
-        this.generatePreview();
+        // Initialize UI helpers if available
+        if (typeof HBSUIHelpers !== 'undefined') {
+            HBSUIHelpers.initMenuSections();
+        }
         
         console.log("HBS Web App UI initialized");
     }
 
     /**
-     * Constructs the prompt text based on the current form values
-     * @returns {string} The constructed prompt text
+     * Generates the prompt using the prompt generator and displays it
      */
-    constructPrompt() {
-        let promptText = "";
+    generatePrompt() {
         try {
-            // Get form values
+            // Build character data object that matches what generateT2IPrompt expects
             const formValues = this.getFormValues();
+            const characterData = {
+                metadata: {
+                    version: "v004",
+                    character_name: document.getElementById('character-name')?.value || "",
+                    timestamp: new Date().toISOString()
+                },
+                t2i_parameters: formValues
+            };
             
-            // Safety check to prevent accessing replace on undefined values
-            if (!formValues) {
-                console.error("Form values are undefined");
-                return "Error: Unable to construct prompt from undefined form values";
-            }
+            // Get style options
+            const stylePrefix = document.getElementById('style-prefix')?.value || '';
+            const styleSuffix = document.getElementById('style-suffix')?.value || '';
+            const includeDetails = document.getElementById('include-details')?.checked ?? true;
             
-            // Start with basic description
-            promptText = `A ${formValues.gender || 'character'}`;
-            
-            // Add heritage if selected
-            if (formValues.visual_heritage && formValues.visual_heritage !== "Custom Heritage") {
-                promptText += ` with ${formValues.visual_heritage}`;
-            }
-            
-            // Add age
-            if (formValues.age) {
-                promptText += `, ${formValues.age}`;
-            }
-            
-            // Add build and height if selected
-            if (formValues.build) {
-                promptText += `, ${formValues.build} build`;
-            }
-            
-            if (formValues.height) {
-                promptText += `, ${formValues.height} height`;
-            }
-            
-            // Add skin details
-            if (formValues.skin_tone) {
-                promptText += `, with ${formValues.skin_tone}`;
-                
-                if (formValues.skin_texture) {
-                    promptText += ` and ${formValues.skin_texture} skin texture`;
-                }
-            }
-            
-            // Add facial features
-            let facialFeatures = [];
-            
-            if (formValues.head_shape) {
-                facialFeatures.push(`${formValues.head_shape} head shape`);
-            }
-            
-            if (formValues.face_shape) {
-                facialFeatures.push(`${formValues.face_shape} face shape`);
-            }
-            
-            if (formValues.forehead) {
-                facialFeatures.push(`${formValues.forehead} forehead`);
-            }
-            
-            // Add jawline if available
-            if (formValues.jawline) {
-                facialFeatures.push(`${formValues.jawline} jawline`);
-            }
-            
-            // Add cheekbones if available
-            if (formValues.cheekbones) {
-                facialFeatures.push(`${formValues.cheekbones} cheekbones`);
-            }
-            
-            // Add eyes details if available
-            if (formValues.eyes && formValues.eyes.shape) {
-                let eyeDesc = `${formValues.eyes.shape} eyes`;
-                if (formValues.eyes.modifiers && Array.isArray(formValues.eyes.modifiers) && formValues.eyes.modifiers.length > 0) {
-                    eyeDesc += ` (${formValues.eyes.modifiers.join(", ")})`;
-                }
-                facialFeatures.push(eyeDesc);
-            }
-            
-            // Add eye color if available
-            if (formValues.eye_color) {
-                facialFeatures.push(`${formValues.eye_color} eye color`);
-            }
-            
-            // Add eyebrows if available
-            if (formValues.eyebrows && formValues.eyebrows.shape) {
-                let eyebrowDesc = `${formValues.eyebrows.shape} eyebrows`;
-                if (formValues.eyebrows.modifiers && Array.isArray(formValues.eyebrows.modifiers) && formValues.eyebrows.modifiers.length > 0) {
-                    eyebrowDesc += ` (${formValues.eyebrows.modifiers.join(", ")})`;
-                }
-                facialFeatures.push(eyebrowDesc);
-            }
-            
-            // Add nose if available
-            if (formValues.nose && formValues.nose.shape) {
-                let noseDesc = `${formValues.nose.shape} nose`;
-                if (formValues.nose.modifiers && Array.isArray(formValues.nose.modifiers) && formValues.nose.modifiers.length > 0) {
-                    noseDesc += ` (${formValues.nose.modifiers.join(", ")})`;
-                }
-                facialFeatures.push(noseDesc);
-            }
-            
-            // Add mouth if available
-            if (formValues.mouth) {
-                facialFeatures.push(`${formValues.mouth} mouth`);
-            }
-            
-            // Add lips if available
-            if (formValues.lips) {
-                facialFeatures.push(`${formValues.lips} lips`);
-            }
-            
-            // Join facial features with commas
-            if (facialFeatures.length > 0) {
-                promptText += `, with ${facialFeatures.join(", ")}`;
-            }
-            
-            // Add facial hair if available
-            if (formValues.facial_hair && formValues.facial_hair !== "None" && formValues.facial_hair !== "Clean Shaven") {
-                promptText += `, with ${formValues.facial_hair}`;
-            }
-            
-            // Add hair details if not bald
-            if (formValues.hair_style !== "Bald") {
-                let hairDescription = "";
-                
-                // Handle hair color safely
-                if (formValues.hair_color) {
-                    const colorGroup = formValues.hair_color.color_group;
-                    const specificShade = formValues.hair_color.specific_shade;
-                    
-                    if (colorGroup && specificShade && colorGroup !== "Not Applicable") {
-                        hairDescription += `${specificShade} ${colorGroup} `;
-                    }
-                }
-                
-                // Handle hair texture safely
-                if (formValues.hair_texture && typeof formValues.hair_texture === 'string') {
-                    hairDescription += `${formValues.hair_texture.toLowerCase()} `;
-                } else if (formValues.hair_texture) {
-                    hairDescription += `${formValues.hair_texture} `;
-                }
-                
-                // Handle hair length safely
-                if (formValues.hair_length && typeof formValues.hair_length === 'string') {
-                    hairDescription += `${formValues.hair_length.toLowerCase()} `;
-                } else if (formValues.hair_length) {
-                    hairDescription += `${formValues.hair_length} `;
-                }
-                
-                // Only add hair description if we have at least some details
-                if (hairDescription && hairDescription.trim() !== "") {
-                    promptText += `, with ${hairDescription.trim()}hair`;
-                }
-                
-                // Add hair style details
-                if (formValues.hair_style && formValues.hair_style !== "Bald") {
-                    promptText += `, styled in a ${formValues.hair_style}`;
-                }
-                
-                // Add hair parting if applicable
-                if (formValues.hair_parting && formValues.hair_parting !== "Not Applicable" && formValues.hair_parting !== "No Part") {
-                    try {
-                        // Use debug helper if available
-                        if (this.debug) {
-                            promptText += ` with a ${this.debug.safeStringMethod(formValues.hair_parting, 'toLowerCase', 'hair part')}`;
-                        } else {
-                            // Fall back to basic safety
-                            if (typeof formValues.hair_parting === 'string') {
-                                promptText += ` with a ${formValues.hair_parting.toLowerCase()}`;
-                            } else {
-                                promptText += ` with a hair part`;
-                            }
-                        }
-                    } catch (e) {
-                        console.error("Error processing hair parting:", e);
-                        promptText += ` with a hair part`;
-                    }
-                }
-                
-                // Add bangs/fringe if applicable
-                if (formValues.bangs_fringe && formValues.bangs_fringe !== "None" && formValues.bangs_fringe !== "Not Applicable") {
-                    promptText += ` and ${formValues.bangs_fringe}`;
-                }
-                
-                // Add tails and buns if applicable
-                if (formValues.tails_and_buns && formValues.tails_and_buns !== "None") {
-                    promptText += `, worn in a ${formValues.tails_and_buns}`;
-                }
-                
-                // Add hair style modifiers if applicable
-                if (formValues.hair_style_modifiers && Array.isArray(formValues.hair_style_modifiers) && formValues.hair_style_modifiers.length > 0) {
-                    try {
-                        const joinedModifiers = formValues.hair_style_modifiers.join(" and ");
-                        if (typeof joinedModifiers === 'string') {
-                            promptText += `, ${joinedModifiers.toLowerCase()}`;
-                        } else {
-                            promptText += `, ${joinedModifiers}`;
-                        }
-                    } catch (e) {
-                        console.error("Error processing hair style modifiers:", e);
-                    }
-                }
+            // Generate prompt using the generateT2IPrompt function
+            let promptText = "";
+            if (typeof generateT2IPrompt === 'function') {
+                promptText = generateT2IPrompt(characterData, {
+                    stylePrefix,
+                    styleSuffix,
+                    includeDetails
+                });
             } else {
-                promptText += ", bald";
+                // Fallback to simple method
+                promptText = this.constructPrompt();
             }
             
-            return promptText;
+            // Display the prompt in output area
+            const promptOutput = document.getElementById('prompt-output');
+            if (promptOutput) {
+                promptOutput.textContent = promptText;
+            }
+            
+            // Also update preview area
+            const previewPrompt = document.getElementById('preview-prompt');
+            if (previewPrompt) {
+                previewPrompt.textContent = promptText;
+            }
+            
+            // Enable save button if character has a name
+            if (characterData.metadata.character_name) {
+                const saveBtn = document.getElementById('save-btn');
+                if (saveBtn) saveBtn.disabled = false;
+            }
+            
+            console.log("Prompt generated successfully");
         } catch (error) {
-            console.error("Error constructing prompt:", error);
-            // Return a safe default instead of the error message
-            return "A character with default features";
+            console.error("Error generating prompt:", error);
+            this.showError("Failed to generate prompt: " + error.message);
         }
     }
 
     /**
-     * Generates a preview of the character based on the current form values
+     * Resets the form to default values
      */
-    generatePreview() {
+    resetForm() {
         try {
-            const formValues = this.getFormValues();
-            
-            if (!formValues) {
-                console.error("Form values are undefined in generatePreview");
-                this.showError("Unable to generate preview: Form values are undefined");
+            const form = document.getElementById('hbs-form');
+            if (form) {
+                form.reset();
+                
+                // Clear character name
+                const nameInput = document.getElementById('character-name');
+                if (nameInput) nameInput.value = '';
+                
+                // Disable save button
+                const saveBtn = document.getElementById('save-btn');
+                if (saveBtn) saveBtn.disabled = true;
+                
+                // Clear the output
+                const promptOutput = document.getElementById('prompt-output');
+                if (promptOutput) promptOutput.textContent = '';
+                
+                const previewPrompt = document.getElementById('preview-prompt');
+                if (previewPrompt) previewPrompt.textContent = '';
+                
+                console.log("Form reset successfully");
+            }
+        } catch (error) {
+            console.error("Error resetting form:", error);
+            this.showError("Failed to reset form: " + error.message);
+        }
+    }
+
+    /**
+     * Saves the current character to a JSON file
+     */
+    saveCharacter() {
+        try {
+            const characterName = document.getElementById('character-name')?.value;
+            if (!characterName) {
+                this.showError("Please provide a character name before saving");
                 return;
             }
             
-            // Construct prompt text
-            const promptText = this.constructPrompt();
+            const formValues = this.getFormValues();
+            const characterData = {
+                metadata: {
+                    version: "v004",
+                    character_name: characterName,
+                    timestamp: new Date().toISOString()
+                },
+                t2i_parameters: formValues
+            };
             
-            // Display the prompt in the preview area
-            const previewArea = document.getElementById('preview-area');
-            if (previewArea) {
-                previewArea.textContent = promptText;
-            } else {
-                console.error("Preview area element not found");
-            }
+            // Convert to JSON
+            const jsonData = JSON.stringify(characterData, null, 2);
             
-            // Add code here to send the prompt to an image generation API if needed
+            // Create download link
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${characterName.replace(/[^\w]/g, '_')}.json`;
+            document.body.appendChild(a);
+            a.click();
             
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 0);
+            
+            console.log("Character saved successfully");
         } catch (error) {
-            console.error("Error generating preview:", error);
-            this.showError("Failed to generate preview: " + (error.message || "Unknown error"));
+            console.error("Error saving character:", error);
+            this.showError("Failed to save character: " + error.message);
+        }
+    }
+
+    /**
+     * Loads a character from a JSON file
+     * @param {Event} event - The file input change event
+     */
+    loadCharacter(event) {
+        try {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const characterData = JSON.parse(e.target.result);
+                    
+                    // Set character name
+                    const nameInput = document.getElementById('character-name');
+                    if (nameInput && characterData.metadata?.character_name) {
+                        nameInput.value = characterData.metadata.character_name;
+                    }
+                    
+                    // TODO: Populate form with characterData.t2i_parameters
+                    // This would require a separate function to set form values
+                    
+                    // Enable save button
+                    const saveBtn = document.getElementById('save-btn');
+                    if (saveBtn && nameInput.value) {
+                        saveBtn.disabled = false;
+                    }
+                    
+                    // Generate prompt from loaded data
+                    this.generatePrompt();
+                    
+                    console.log("Character loaded successfully");
+                } catch (error) {
+                    console.error("Error parsing character file:", error);
+                    this.showError("Failed to parse character file: " + error.message);
+                }
+            };
+            
+            reader.readAsText(file);
+        } catch (error) {
+            console.error("Error loading character:", error);
+            this.showError("Failed to load character: " + error.message);
         }
     }
 
@@ -302,7 +278,6 @@ class HBSWebApp {
      * @param {string} message - The error message to show
      */
     showError(message) {
-        // Add error display logic
         console.error(message);
         
         const errorElement = document.getElementById('error-message');
@@ -314,6 +289,9 @@ class HBSWebApp {
             setTimeout(() => {
                 errorElement.style.display = 'none';
             }, 5000);
+        } else {
+            // If there's no error element, show an alert
+            alert(message);
         }
     }
 
@@ -358,8 +336,8 @@ class HBSWebApp {
                 hair_style_modifiers: []
             };
             
-            // Get all form inputs
-            const formElements = document.querySelectorAll('#character-form select, #character-form input');
+            // Get all form inputs from the hbs-form
+            const formElements = document.querySelectorAll('#hbs-form select, #hbs-form input');
             if (!formElements || formElements.length === 0) {
                 console.warn("No form elements found");
                 return defaults; // Return defaults if no form elements
