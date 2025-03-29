@@ -325,20 +325,29 @@ class HBSWebApp {
         try {
             const formData = {};
             
-            // Add default values for all properties that might cause toLowerCase() errors
+            // Add default values for all 28 required properties
             const defaults = {
+                // Core identity (1-3)
                 gender: "character",
                 visual_heritage: "",
                 age: "",
+                
+                // Physical attributes (4-5)
                 build: "",
                 height: "",
+                
+                // Skin appearance (6-7)
                 skin_tone: "",
                 skin_texture: "",
+                
+                // Face structure (8-12)
                 head_shape: "",
                 face_shape: "",
                 forehead: "",
                 jawline: "",
                 cheekbones: "",
+                
+                // Facial features (13-19)
                 eyes: { shape: "", modifiers: [] },
                 eye_color: "",
                 eyebrows: { shape: "", modifiers: [] },
@@ -346,6 +355,8 @@ class HBSWebApp {
                 mouth: "",
                 lips: "",
                 facial_hair: "None",
+                
+                // Hair attributes (20-28)
                 hair_texture: "",
                 hair_density: "",
                 hair_volume: "",
