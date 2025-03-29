@@ -146,13 +146,17 @@ class HBSWebApp {
                 }
                 
                 // Handle hair texture
-                if (formValues.hair_texture) {
+                if (formValues.hair_texture && typeof formValues.hair_texture === 'string') {
                     hairDescription += `${formValues.hair_texture.toLowerCase()} `;
+                } else if (formValues.hair_texture) {
+                    hairDescription += `${formValues.hair_texture} `;
                 }
                 
                 // Handle hair length
-                if (formValues.hair_length) {
+                if (formValues.hair_length && typeof formValues.hair_length === 'string') {
                     hairDescription += `${formValues.hair_length.toLowerCase()} `;
+                } else if (formValues.hair_length) {
+                    hairDescription += `${formValues.hair_length} `;
                 }
                 
                 // Only add hair description if we have at least some details
@@ -167,7 +171,11 @@ class HBSWebApp {
                 
                 // Add hair parting if applicable
                 if (formValues.hair_parting && formValues.hair_parting !== "Not Applicable" && formValues.hair_parting !== "No Part") {
-                    promptText += ` with a ${formValues.hair_parting.toLowerCase()}`;
+                    if (typeof formValues.hair_parting === 'string') {
+                        promptText += ` with a ${formValues.hair_parting.toLowerCase()}`;
+                    } else {
+                        promptText += ` with a ${formValues.hair_parting}`;
+                    }
                 }
                 
                 // Add bangs/fringe if applicable
@@ -182,7 +190,16 @@ class HBSWebApp {
                 
                 // Add hair style modifiers if applicable
                 if (formValues.hair_style_modifiers && Array.isArray(formValues.hair_style_modifiers) && formValues.hair_style_modifiers.length > 0) {
-                    promptText += `, ${formValues.hair_style_modifiers.join(" and ").toLowerCase()}`;
+                    try {
+                        const joinedModifiers = formValues.hair_style_modifiers.join(" and ");
+                        if (typeof joinedModifiers === 'string') {
+                            promptText += `, ${joinedModifiers.toLowerCase()}`;
+                        } else {
+                            promptText += `, ${joinedModifiers}`;
+                        }
+                    } catch (e) {
+                        console.error("Error processing hair style modifiers:", e);
+                    }
                 }
             } else {
                 promptText += ", bald";
@@ -278,43 +295,77 @@ class HBSWebApp {
             });
             
             // Special handling for complex objects
-            // Eyes
-            const eyeShape = document.querySelector('select[name="eye_shape"]');
-            const eyeModifiers = Array.from(document.querySelectorAll('input[name="eye_modifiers"]:checked')).map(el => el.value);
-            if (eyeShape) {
-                formData.eyes = {
-                    shape: eyeShape.value || "",
-                    modifiers: eyeModifiers || []
-                };
+            try {
+                // Eyes
+                const eyeShape = document.querySelector('select[name="eye_shape"]');
+                const eyeModifiers = Array.from(
+                    document.querySelectorAll('input[name="eye_modifiers"]:checked') || []
+                ).map(el => el.value);
+                if (eyeShape) {
+                    formData.eyes = {
+                        shape: eyeShape.value || "",
+                        modifiers: eyeModifiers || []
+                    };
+                } else {
+                    formData.eyes = { shape: "", modifiers: [] };
+                }
+                
+                // Eyebrows
+                const eyebrowShape = document.querySelector('select[name="eyebrow_shape"]');
+                const eyebrowModifiers = Array.from(
+                    document.querySelectorAll('input[name="eyebrow_modifiers"]:checked') || []
+                ).map(el => el.value);
+                if (eyebrowShape) {
+                    formData.eyebrows = {
+                        shape: eyebrowShape.value || "",
+                        modifiers: eyebrowModifiers || []
+                    };
+                } else {
+                    formData.eyebrows = { shape: "", modifiers: [] };
+                }
+                
+                // Nose
+                const noseShape = document.querySelector('select[name="nose_shape"]');
+                const noseModifiers = Array.from(
+                    document.querySelectorAll('input[name="nose_modifiers"]:checked') || []
+                ).map(el => el.value);
+                if (noseShape) {
+                    formData.nose = {
+                        shape: noseShape.value || "",
+                        modifiers: noseModifiers || []
+                    };
+                } else {
+                    formData.nose = { shape: "", modifiers: [] };
+                }
+            } catch (e) {
+                console.error("Error processing complex form elements:", e);
+                // Set defaults for these objects
+                formData.eyes = { shape: "", modifiers: [] };
+                formData.eyebrows = { shape: "", modifiers: [] };
+                formData.nose = { shape: "", modifiers: [] };
             }
             
-            // Eyebrows
-            const eyebrowShape = document.querySelector('select[name="eyebrow_shape"]');
-            const eyebrowModifiers = Array.from(document.querySelectorAll('input[name="eyebrow_modifiers"]:checked')).map(el => el.value);
-            if (eyebrowShape) {
-                formData.eyebrows = {
-                    shape: eyebrowShape.value || "",
-                    modifiers: eyebrowModifiers || []
-                };
-            }
-            
-            // Nose
-            const noseShape = document.querySelector('select[name="nose_shape"]');
-            const noseModifiers = Array.from(document.querySelectorAll('input[name="nose_modifiers"]:checked')).map(el => el.value);
-            if (noseShape) {
-                formData.nose = {
-                    shape: noseShape.value || "",
-                    modifiers: noseModifiers || []
-                };
-            }
-            
-            // Hair color
-            const colorGroup = document.querySelector('select[name="hair_color_group"]');
-            const specificShade = document.querySelector('select[name="hair_color_shade"]');
-            if (colorGroup) {
+            // Hair color - with better error handling
+            try {
+                const colorGroup = document.querySelector('select[name="hair_color_group"]');
+                const specificShade = document.querySelector('select[name="hair_color_shade"]');
+                
+                if (colorGroup) {
+                    formData.hair_color = {
+                        color_group: colorGroup.value || "Not Applicable",
+                        specific_shade: specificShade ? (specificShade.value || "") : ""
+                    };
+                } else {
+                    formData.hair_color = {
+                        color_group: "Not Applicable",
+                        specific_shade: ""
+                    };
+                }
+            } catch (e) {
+                console.error("Error processing hair color data:", e);
                 formData.hair_color = {
-                    color_group: colorGroup.value || "Not Applicable",
-                    specific_shade: specificShade ? (specificShade.value || "") : ""
+                    color_group: "Not Applicable",
+                    specific_shade: ""
                 };
             }
             
@@ -325,7 +376,22 @@ class HBSWebApp {
             return formData;
         } catch (error) {
             console.error("Error getting form values:", error);
-            return { gender: "character" }; // Return minimal default
+            // Return a more comprehensive default object to prevent undefined errors
+            return {
+                gender: "character",
+                hair_color: {
+                    color_group: "Not Applicable",
+                    specific_shade: ""
+                },
+                hair_style_modifiers: [],
+                eyes: { shape: "", modifiers: [] },
+                eyebrows: { shape: "", modifiers: [] },
+                nose: { shape: "", modifiers: [] },
+                hair_texture: "",
+                hair_length: "",
+                hair_parting: "Not Applicable",
+                hair_style: ""
+            };
         }
     }
 }
