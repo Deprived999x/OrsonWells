@@ -1,6 +1,3 @@
-// Human Builder System Web App v004
-// Includes support for the separated "Tails and Buns" category
-
 /**
  * Web app implementation of the Human Builder System
  */
