@@ -89,26 +89,4 @@ function generateT2IPrompt(characterData, options = {}) {
 
     // Add eyebrows if distinctive
     if (params.eyebrows.modifiers && params.eyebrows.modifiers.length > 0) {
-      const eyebrowDesc = params.eyebrows.modifiers.map(m => m.toLowerCase()).join(' ');
-      promptParts.push(`${eyebrowDesc} eyebrows`);
-    }
-
-    // Add nose if distinctive
-    if (params.nose.shape !== "Straight" || params.nose.modifiers?.length > 0) {
-      const noseDesc = params.nose.modifiers?.map(m => m.toLowerCase()).join(" ") + " " + params.nose.shape.toLowerCase() + " nose";
-      promptParts.push(noseDesc);
-    }
-
-    // Add mouth and lips
-    if (params.lips !== "Medium") {
-      promptParts.push(`${params.lips.toLowerCase()} lips`);
-    }
-  }
-
-  // Add style suffix if provided
-  if (styleSuffix) {
-    promptParts.push(styleSuffix);
-  }
-
-  return promptParts.join(", ");
-}
+      const eyebrowDesc = params* ▋
