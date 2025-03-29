@@ -4,7 +4,20 @@
  */
 class HBSFormGenerator {
     constructor(schema) {
-        this.schema = schema;
+        // Ensure there's always a valid schema object
+        this.schema = schema || {
+            t2i_parameters: {
+                properties: {}
+            },
+            gender_conditional_options: {
+                female_build_options: [],
+                male_build_options: []
+            },
+            hair_color_options: {}
+        };
+        
+        // Debug schema structure to help diagnose issues
+        console.log("Schema structure:", Object.keys(this.schema));
     }
 
     /**
@@ -119,17 +132,38 @@ class HBSFormGenerator {
      */
     getEnumValuesOrDefault(propertyName, defaultValues) {
         try {
-            if (this.schema && 
-                this.schema.t2i_parameters && 
-                this.schema.t2i_parameters.properties && 
-                this.schema.t2i_parameters.properties[propertyName] && 
-                this.schema.t2i_parameters.properties[propertyName].enum) {
-                return this.schema.t2i_parameters.properties[propertyName].enum;
+            // Check if the schema structure is as expected
+            if (!this.schema) {
+                console.warn(`Schema is undefined, using default values for ${propertyName}`);
+                return defaultValues;
             }
+            
+            if (!this.schema.t2i_parameters) {
+                console.warn(`Schema.t2i_parameters is undefined, using default values for ${propertyName}`);
+                return defaultValues;
+            }
+            
+            if (!this.schema.t2i_parameters.properties) {
+                console.warn(`Schema.t2i_parameters.properties is undefined, using default values for ${propertyName}`);
+                return defaultValues;
+            }
+            
+            const property = this.schema.t2i_parameters.properties[propertyName];
+            if (!property) {
+                console.warn(`Property ${propertyName} not found in schema, using default values`);
+                return defaultValues;
+            }
+            
+            if (!property.enum) {
+                console.warn(`Property ${propertyName} has no enum values, using default values`);
+                return defaultValues;
+            }
+            
+            return property.enum;
         } catch (error) {
-            console.warn(`Could not get enum values for ${propertyName}:`, error);
+            console.warn(`Error getting enum values for ${propertyName}:`, error);
+            return defaultValues;
         }
-        return defaultValues;
     }
 
     /**
@@ -466,31 +500,44 @@ window.HBSFormGenerator = HBSFormGenerator;
 
 // Initialize form when document is ready
 document.addEventListener('DOMContentLoaded', () => {
-    // First try to use schema from HBS App if it exists
-    if (window.hbsApp && window.hbsApp.schema) {
-        try {
-            const formGenerator = new HBSFormGenerator(window.hbsApp.schema);
-            formGenerator.generateForm('hbs-form');
-        } catch (error) {
-            console.error('Error initializing form generator:', error);
-        }
-    } else {
-        // Otherwise, fetch the schema directly
-        fetch('schema/hbs-schema-v004.json')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch schema: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(schema => {
-                const formGenerator = new HBSFormGenerator(schema);
+    try {
+        // Check if the schema was loaded by the web app
+        if (window.hbsApp && window.hbsApp.schema) {
+            console.log("Using schema from HBS App");
+            try {
+                const formGenerator = new HBSFormGenerator(window.hbsApp.schema);
                 formGenerator.generateForm('hbs-form');
-            })
-            .catch(error => {
-                console.error('Error fetching schema for form generator:', error);
-                document.getElementById('hbs-form').innerHTML = 
-                    '<p>Error loading form. Please check console for details.</p>';
-            });
+            } catch (error) {
+                console.error('Error initializing form generator with app schema:', error);
+                // Fall back to hardcoded values if there's an error
+                const formGenerator = new HBSFormGenerator(null);
+                formGenerator.generateForm('hbs-form');
+            }
+        } else {
+            console.log("Fetching schema directly");
+            // Otherwise, fetch the schema directly
+            fetch('schema/hbs-schema-v004.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch schema: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(schema => {
+                    console.log("Schema loaded from file", Object.keys(schema));
+                    const formGenerator = new HBSFormGenerator(schema);
+                    formGenerator.generateForm('hbs-form');
+                })
+                .catch(error => {
+                    console.error('Error fetching schema for form generator:', error);
+                    // Create with null schema to use defaults
+                    const formGenerator = new HBSFormGenerator(null);
+                    formGenerator.generateForm('hbs-form');
+                });
+        }
+    } catch (error) {
+        console.error('Global error in form initialization:', error);
+        document.getElementById('hbs-form').innerHTML = 
+            '<p>Error loading form. Please check console for details.</p>';
     }
 });
