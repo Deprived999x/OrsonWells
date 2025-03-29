@@ -5,6 +5,8 @@
 class HBSWebApp {
     constructor() {
         this.validator = new HBSValidator(hbsSchema);
+        // Load the debug helper if available
+        this.debug = (typeof HBSDebugHelper !== 'undefined') ? HBSDebugHelper : null;
     }
 
     /**
@@ -145,14 +147,14 @@ class HBSWebApp {
                     }
                 }
                 
-                // Handle hair texture
+                // Handle hair texture safely
                 if (formValues.hair_texture && typeof formValues.hair_texture === 'string') {
                     hairDescription += `${formValues.hair_texture.toLowerCase()} `;
                 } else if (formValues.hair_texture) {
                     hairDescription += `${formValues.hair_texture} `;
                 }
                 
-                // Handle hair length
+                // Handle hair length safely
                 if (formValues.hair_length && typeof formValues.hair_length === 'string') {
                     hairDescription += `${formValues.hair_length.toLowerCase()} `;
                 } else if (formValues.hair_length) {
@@ -171,10 +173,21 @@ class HBSWebApp {
                 
                 // Add hair parting if applicable
                 if (formValues.hair_parting && formValues.hair_parting !== "Not Applicable" && formValues.hair_parting !== "No Part") {
-                    if (typeof formValues.hair_parting === 'string') {
-                        promptText += ` with a ${formValues.hair_parting.toLowerCase()}`;
-                    } else {
-                        promptText += ` with a ${formValues.hair_parting}`;
+                    try {
+                        // Use debug helper if available
+                        if (this.debug) {
+                            promptText += ` with a ${this.debug.safeStringMethod(formValues.hair_parting, 'toLowerCase', 'hair part')}`;
+                        } else {
+                            // Fall back to basic safety
+                            if (typeof formValues.hair_parting === 'string') {
+                                promptText += ` with a ${formValues.hair_parting.toLowerCase()}`;
+                            } else {
+                                promptText += ` with a hair part`;
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error processing hair parting:", e);
+                        promptText += ` with a hair part`;
                     }
                 }
                 
@@ -273,11 +286,44 @@ class HBSWebApp {
         try {
             const formData = {};
             
+            // Add default values for all properties that might cause toLowerCase() errors
+            const defaults = {
+                gender: "character",
+                visual_heritage: "",
+                age: "",
+                build: "",
+                height: "",
+                skin_tone: "",
+                skin_texture: "",
+                head_shape: "",
+                face_shape: "",
+                forehead: "",
+                jawline: "",
+                cheekbones: "",
+                eyes: { shape: "", modifiers: [] },
+                eye_color: "",
+                eyebrows: { shape: "", modifiers: [] },
+                nose: { shape: "", modifiers: [] },
+                mouth: "",
+                lips: "",
+                facial_hair: "None",
+                hair_texture: "",
+                hair_density: "",
+                hair_volume: "",
+                hair_length: "",
+                hair_color: { color_group: "Not Applicable", specific_shade: "" },
+                hair_parting: "Not Applicable",
+                bangs_fringe: "None",
+                tails_and_buns: "None",
+                hair_style: "",
+                hair_style_modifiers: []
+            };
+            
             // Get all form inputs
             const formElements = document.querySelectorAll('#character-form select, #character-form input');
             if (!formElements || formElements.length === 0) {
                 console.warn("No form elements found");
-                return { gender: "character" }; // Return minimal default
+                return defaults; // Return defaults if no form elements
             }
             
             // Process each form element
@@ -370,27 +416,57 @@ class HBSWebApp {
             }
             
             // Hair style modifiers
-            const hairStyleModifiers = Array.from(document.querySelectorAll('input[name="hair_style_modifiers"]:checked')).map(el => el.value);
-            formData.hair_style_modifiers = hairStyleModifiers || [];
+            try {
+                const hairStyleModifiers = Array.from(
+                    document.querySelectorAll('input[name="hair_style_modifiers"]:checked') || []
+                ).map(el => el.value);
+                formData.hair_style_modifiers = hairStyleModifiers || [];
+            } catch (e) {
+                console.error("Error processing hair style modifiers:", e);
+                formData.hair_style_modifiers = [];
+            }
+            
+            // Apply defaults for any missing properties
+            Object.keys(defaults).forEach(key => {
+                if (formData[key] === undefined) {
+                    formData[key] = defaults[key];
+                }
+            });
             
             return formData;
         } catch (error) {
             console.error("Error getting form values:", error);
-            // Return a more comprehensive default object to prevent undefined errors
+            // Return a comprehensive default object to prevent undefined errors
             return {
                 gender: "character",
-                hair_color: {
-                    color_group: "Not Applicable",
-                    specific_shade: ""
-                },
-                hair_style_modifiers: [],
+                visual_heritage: "",
+                age: "",
+                build: "",
+                height: "",
+                skin_tone: "",
+                skin_texture: "",
+                head_shape: "",
+                face_shape: "",
+                forehead: "",
+                jawline: "",
+                cheekbones: "",
                 eyes: { shape: "", modifiers: [] },
+                eye_color: "",
                 eyebrows: { shape: "", modifiers: [] },
                 nose: { shape: "", modifiers: [] },
+                mouth: "",
+                lips: "",
+                facial_hair: "None",
                 hair_texture: "",
+                hair_density: "",
+                hair_volume: "",
                 hair_length: "",
+                hair_color: { color_group: "Not Applicable", specific_shade: "" },
                 hair_parting: "Not Applicable",
-                hair_style: ""
+                bangs_fringe: "None",
+                tails_and_buns: "None",
+                hair_style: "",
+                hair_style_modifiers: []
             };
         }
     }
