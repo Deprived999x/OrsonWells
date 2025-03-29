@@ -235,5 +235,10 @@ console.log(prompt);
 // Result: "professional portrait photo of a young adult Latino woman with athletic build, with sun-kissed tan skin, heart face, upturned almond brown eyes, groomed tapered arched eyebrows, narrow-bridge straight nose, full lips, shoulder length high volume wavy deep brown hair with high ponytail, shiny with side-swept bangs, high resolution, detailed features, soft natural lighting"
 */
 
-// Export the function
-module.exports = generateT2IPrompt;
+// Export the function for both browser and Node.js environments
+if (typeof module !== 'undefined') {
+    module.exports = generateT2IPrompt;
+} else {
+    // Make available globally in browser
+    window.generateT2IPrompt = generateT2IPrompt;
+}
