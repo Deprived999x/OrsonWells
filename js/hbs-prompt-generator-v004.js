@@ -25,7 +25,10 @@ function generateT2IPrompt(characterData, options = {}) {
     promptParts.push(stylePrefix);
   }
 
-  // Core identity description - with safety checks for missing values
+  // Build the prompt in the correct parameter order
+
+  // Core identity information
+  // 1. Gender, 2. Visual heritage, 3. Age
   let identity = "person";
   if (params.gender === "Identify as female") {
     identity = "woman";
@@ -33,18 +36,16 @@ function generateT2IPrompt(characterData, options = {}) {
     identity = "man";
   }
 
-  // Add visual heritage if not custom and if it exists
   if (params.visual_heritage && params.visual_heritage !== "Custom Heritage") {
     const heritage = params.visual_heritage.replace(" Heritage", "");
     identity = `${heritage} ${identity}`;
   }
 
-  // Add age
   let ageDescription = "";
   if (params.age) {
     switch (params.age) {
       case "Pre-adolescent Child":
-        identity = "child"; // Override the gender+ethnicity with just "child"
+        identity = "child";
         ageDescription = "young";
         break;
       case "Teenage Years":
@@ -65,14 +66,14 @@ function generateT2IPrompt(characterData, options = {}) {
     }
   }
 
-  // Combine identity elements
   if (ageDescription) {
     promptParts.push(`${ageDescription} ${identity}`);
   } else {
     promptParts.push(identity);
   }
 
-  // Add build and height if adult and if they exist
+  // Physical attributes
+  // 4. Build, 5. Height
   if (params.age !== "Pre-adolescent Child" && params.build) {
     promptParts.push(`with ${(params.build || "").replace("-Female", "").replace("-Male", "")} build`);
 
@@ -81,18 +82,43 @@ function generateT2IPrompt(characterData, options = {}) {
     }
   }
 
-  // Add skin details if they exist
+  // Skin appearance
+  // 6. Skin tone, 7. Skin texture
   if (params.skin_tone) {
     promptParts.push(`with ${params.skin_tone.toLowerCase()} skin`);
+    
+    if (params.skin_texture && params.skin_texture !== "Normal Textured") {
+      promptParts.push(`with ${params.skin_texture.toLowerCase()} texture`);
+    }
   }
 
   if (includeDetails) {
-    // Add facial structure if it exists
+    // Face structure
+    // 8. Head shape, 9. Face shape, 10. Forehead, 11. Jawline, 12. Cheekbones
+    let faceDescription = [];
+    
     if (params.face_shape) {
-      promptParts.push(`${params.face_shape.toLowerCase()} face`);
+      faceDescription.push(`${params.face_shape.toLowerCase()} face`);
+    }
+    
+    if (params.forehead) {
+      faceDescription.push(`${params.forehead.toLowerCase()} forehead`);
+    }
+    
+    if (params.jawline) {
+      faceDescription.push(`${params.jawline.toLowerCase()} jawline`);
+    }
+    
+    if (params.cheekbones) {
+      faceDescription.push(`${params.cheekbones.toLowerCase()} cheekbones`);
+    }
+    
+    if (faceDescription.length > 0) {
+      promptParts.push(faceDescription.join(", "));
     }
 
-    // Add eye details with safety checks
+    // Facial features
+    // 13. Eyes (shape, modifiers), 14. Eye color, 15. Eyebrows (shape, modifiers)
     if (params.eyes && params.eyes.shape) {
       const eyeShape = params.eyes.shape.toLowerCase();
       let eyeModifiers = "";
@@ -107,7 +133,6 @@ function generateT2IPrompt(characterData, options = {}) {
       }
     }
 
-    // Add eyebrows if distinctive and if they exist
     if (params.eyebrows && params.eyebrows.shape && 
         params.eyebrows.modifiers && Array.isArray(params.eyebrows.modifiers) && 
         params.eyebrows.modifiers.length > 0) {
@@ -116,7 +141,7 @@ function generateT2IPrompt(characterData, options = {}) {
       promptParts.push(`${eyebrowDesc} eyebrows`);
     }
 
-    // Add nose if distinctive and if it exists
+    // 16. Nose (shape, modifiers)
     if (params.nose && params.nose.shape) {
       if (params.nose.shape !== "Straight" || 
           (params.nose.modifiers && Array.isArray(params.nose.modifiers) && params.nose.modifiers.length > 0)) {
@@ -128,71 +153,78 @@ function generateT2IPrompt(characterData, options = {}) {
       }
     }
 
-    // Add mouth and lips if they exist
+    // 17. Mouth, 18. Lips
     if (params.lips && params.lips !== "Medium") {
       promptParts.push(`${params.lips.toLowerCase()} lips`);
     }
 
-    // Add facial hair for male characters if it exists
+    // 19. Facial hair
     if (params.facial_hair && params.facial_hair !== "None" && params.facial_hair !== "Clean Shaven") {
       promptParts.push(params.facial_hair.toLowerCase());
     }
   }
 
-  // Add hair details if not bald and if it exists
+  // Hair attributes (all 9 remaining parameters)
+  // 20. Hair texture, 21. Hair density, 22. Hair volume, 23. Hair length
+  // 24. Hair color, 25. Hair parting, 26. Bangs/fringe
+  // 27. Tails and buns, 28. Hair style, plus Hair style modifiers
   if (params.hair_style && params.hair_style !== "Bald") {
-    let hairDesc = "";
-
-    // Add length, volume, and texture if not very short and if they exist
-    if (params.hair_length && params.hair_length !== "Buzz Cut") {
-      if (params.hair_length && params.hair_length !== "Shoulder Length") { // Skip if average/default length
-        hairDesc += params.hair_length.toLowerCase() + " ";
-      }
-
-      // Add volume if distinctive and if it exists
-      if (params.hair_volume && params.hair_volume !== "Medium Volume") {
-        let volumeDesc = params.hair_volume.replace(" Volume", "").toLowerCase();
-        hairDesc += volumeDesc + " volume ";
-      }
-
-      // Add texture if it exists
-      if (params.hair_texture) {
-        hairDesc += params.hair_texture.toLowerCase() + " ";
-      }
+    let hairDesc = [];
+    
+    if (params.hair_texture) {
+      hairDesc.push(params.hair_texture.toLowerCase());
     }
-
-    // Add color if it exists
-    if (params.hair_color && params.hair_color.color_group && 
+    
+    if (params.hair_density && params.hair_density !== "Medium Density") {
+      hairDesc.push(params.hair_density.toLowerCase());
+    }
+    
+    if (params.hair_volume && params.hair_volume !== "Medium Volume") {
+      hairDesc.push(params.hair_volume.toLowerCase());
+    }
+    
+    if (params.hair_length && params.hair_length !== "Shoulder Length") {
+      hairDesc.push(params.hair_length.toLowerCase());
+    }
+    
+    if (params.hair_color?.color_group && 
         params.hair_color.color_group !== "Not Applicable" && 
         params.hair_color.specific_shade) {
-      hairDesc += params.hair_color.specific_shade.toLowerCase() + " ";
+      hairDesc.push(params.hair_color.specific_shade.toLowerCase());
     }
-
-    // Add "hair" word
-    hairDesc += "hair";
-
-    // Add style specifics if distinctive and if they exist
+    
+    if (hairDesc.length > 0) {
+      promptParts.push(`${hairDesc.join(" ")} hair`);
+    } else {
+      promptParts.push("hair");
+    }
+    
+    let hairDetails = [];
+    
     if (params.hair_style && params.hair_style !== "Loose Natural") {
-      hairDesc += " in " + params.hair_style.toLowerCase() + " style";
+      hairDetails.push(`in ${params.hair_style.toLowerCase()} style`);
     }
-
-    // Add tails and buns if specified and if they exist
+    
+    if (params.hair_parting && params.hair_parting !== "Not Applicable" && params.hair_parting !== "No Part") {
+      hairDetails.push(`with ${params.hair_parting.toLowerCase()}`);
+    }
+    
+    if (params.bangs_fringe && params.bangs_fringe !== "None" && params.bangs_fringe !== "Not Applicable") {
+      hairDetails.push(`with ${params.bangs_fringe.toLowerCase()}`);
+    }
+    
     if (params.tails_and_buns && params.tails_and_buns !== "None") {
-      hairDesc += ` with ${params.tails_and_buns.toLowerCase()}`;
+      hairDetails.push(`with ${params.tails_and_buns.toLowerCase()}`);
     }
-
-    // Add modifiers if they exist
+    
     if (params.hair_style_modifiers && Array.isArray(params.hair_style_modifiers) && 
         params.hair_style_modifiers.length > 0) {
-      hairDesc += ", " + params.hair_style_modifiers.map(m => m.toLowerCase()).join(" ");
+      hairDetails.push(params.hair_style_modifiers.map(m => m.toLowerCase()).join(" "));
     }
-
-    // Add bangs if they exist
-    if (params.bangs_fringe && params.bangs_fringe !== "None" && params.bangs_fringe !== "Not Applicable") {
-      hairDesc += ` with ${params.bangs_fringe.toLowerCase()}`;
+    
+    if (hairDetails.length > 0) {
+      promptParts.push(hairDetails.join(", "));
     }
-
-    promptParts.push(hairDesc);
   } else if (params.hair_style === "Bald") {
     promptParts.push("bald");
   }
