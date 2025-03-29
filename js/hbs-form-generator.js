@@ -35,11 +35,19 @@ class HBSFormGenerator {
         formContainer.innerHTML = '';
         
         try {
-            // Generate core identity section
+            // Generate sections in the correct order based on the schema
             this.generateIdentitySection(formContainer);
             
-            // Generate appearance sections
+            // Generate skin section
+            this.generateSkinSection(formContainer);
+            
+            // Generate face structure
+            this.generateFaceStructureSection(formContainer);
+            
+            // Generate facial features section
             this.generateFacialFeaturesSection(formContainer);
+            
+            // Generate hair and facial hair section
             this.generateHairSection(formContainer);
             
             // Add submit button
@@ -50,7 +58,7 @@ class HBSFormGenerator {
             submitBtn.textContent = 'Generate Prompt';
             formContainer.appendChild(submitBtn);
             
-            console.log("Form generated successfully");
+            console.log("Form generated successfully with all 28 parameters");
         } catch (error) {
             console.error("Error generating form:", error);
             formContainer.innerHTML = '<p>Error generating form. Please check console for details.</p>';
@@ -119,6 +127,165 @@ class HBSFormGenerator {
         } catch (error) {
             console.error('Error generating identity section:', error);
             fieldset.innerHTML += '<p>Error loading identity options. Using default values.</p>';
+        }
+        
+        container.appendChild(fieldset);
+    }
+
+    /**
+     * Generates the skin section (skin tone, texture)
+     * @param {HTMLElement} container - Container element
+     */
+    generateSkinSection(container) {
+        const fieldset = document.createElement('fieldset');
+        fieldset.innerHTML = '<legend>Skin Appearance</legend>';
+        
+        try {
+            // Skin tone options
+            const skinToneOptions = this.getEnumValuesOrDefault('skin_tone', [
+                "Porcelain Pale Complexion",
+                "Fair Rosy Skin",
+                "Light Beige Tone",
+                "Medium Warm Hue",
+                "Sun-Kissed Tan",
+                "Olive Undertone Skin",
+                "Golden Caramel Shade",
+                "Deep Bronze Coloring",
+                "Rich Mahogany Tone",
+                "Dark Ebony Skin"
+            ]);
+            
+            // Skin texture options
+            const skinTextureOptions = this.getEnumValuesOrDefault('skin_texture', [
+                "Flawless Smooth",
+                "Fine-Pored",
+                "Normal Textured",
+                "Matte Finish",
+                "Dewy Fresh",
+                "Weather-Worn",
+                "Line-Detailed",
+                "Textured Mature",
+                "Scarred Character",
+                "Condition-Specific"
+            ]);
+            
+            // Skin tone
+            const skinToneGroup = this.createFormGroup('skin_tone', 'Skin Tone');
+            const skinToneSelect = this.createSelectElement('skin_tone', skinToneOptions);
+            skinToneGroup.appendChild(skinToneSelect);
+            fieldset.appendChild(skinToneGroup);
+            
+            // Skin texture
+            const skinTextureGroup = this.createFormGroup('skin_texture', 'Skin Texture');
+            const skinTextureSelect = this.createSelectElement('skin_texture', skinTextureOptions);
+            skinTextureGroup.appendChild(skinTextureSelect);
+            fieldset.appendChild(skinTextureGroup);
+            
+        } catch (error) {
+            console.error('Error generating skin section:', error);
+            fieldset.innerHTML += '<p>Error loading skin options. Using default values.</p>';
+        }
+        
+        container.appendChild(fieldset);
+    }
+
+    /**
+     * Generates the face structure section (head shape, face shape, etc.)
+     * @param {HTMLElement} container - Container element
+     */
+    generateFaceStructureSection(container) {
+        const fieldset = document.createElement('fieldset');
+        fieldset.innerHTML = '<legend>Face Structure</legend>';
+        
+        try {
+            // Get options from schema or use defaults
+            const headShapeOptions = this.getEnumValuesOrDefault('head_shape', [
+                "Oval", "Round", "Square", "Rectangular", "Heart", "Diamond", 
+                "Triangle", "Inverted-Triangle", "Long", "Baseball"
+            ]);
+            
+            const faceShapeOptions = this.getEnumValuesOrDefault('face_shape', [
+                "Oval", "Round", "Square", "Rectangular", "Heart", "Diamond", 
+                "Triangle", "Inverted-Triangle", "Long", "Baseball"
+            ]);
+            
+            // Get gender-specific options
+            const gender = document.querySelector('select[name="gender"]')?.value;
+            const isFemale = gender === 'Identify as female';
+            
+            // Default forehead options
+            let foreheadOptions = isFemale ? 
+                ["Smooth High", "Gentle Rounded", "Delicate Flat", "Feminine Slope", "Vertical Balanced"] :
+                ["Pronounced High-and-Wide", "Rugged Receding", "Bossed Prominent", "Strong Flat", "Brow-Heavy", "Angled Structural"];
+            
+            // Default jawline options
+            let jawlineOptions = isFemale ?
+                ["Soft Oval", "Delicate Round", "Tapered Heart", "Subtle Defined", "Graceful Wide", "Elegant Pointed"] :
+                ["Strong Square", "Bold Mandibular", "Chiseled Defined", "Broad Wide", "Rugged Round", "Subtle Receding"];
+            
+            // Default cheekbones options
+            let cheekbonesOptions = isFemale ?
+                ["High-and-Prominent", "Softly-Rounded", "Delicate-Features", "Balanced-Asymmetry", "Dramatic-Contour", "Natural-Flow"] :
+                ["Angular-Definition", "Wide-and-Strong", "Sculpted-Look", "Flat-Profile", "Weathered-Character", "Pronounced-Structure"];
+            
+            // Try to get gender-specific options from the schema
+            try {
+                if (this.schema && this.schema.gender_conditional_options) {
+                    if (isFemale && this.schema.gender_conditional_options.female_forehead_options) {
+                        foreheadOptions = this.schema.gender_conditional_options.female_forehead_options;
+                    } else if (!isFemale && this.schema.gender_conditional_options.male_forehead_options) {
+                        foreheadOptions = this.schema.gender_conditional_options.male_forehead_options;
+                    }
+                    
+                    if (isFemale && this.schema.gender_conditional_options.female_jawline_options) {
+                        jawlineOptions = this.schema.gender_conditional_options.female_jawline_options;
+                    } else if (!isFemale && this.schema.gender_conditional_options.male_jawline_options) {
+                        jawlineOptions = this.schema.gender_conditional_options.male_jawline_options;
+                    }
+                    
+                    if (isFemale && this.schema.gender_conditional_options.female_cheekbones_options) {
+                        cheekbonesOptions = this.schema.gender_conditional_options.female_cheekbones_options;
+                    } else if (!isFemale && this.schema.gender_conditional_options.male_cheekbones_options) {
+                        cheekbonesOptions = this.schema.gender_conditional_options.male_cheekbones_options;
+                    }
+                }
+            } catch (e) {
+                console.warn("Using default gender-specific options");
+            }
+            
+            // Head shape
+            const headShapeGroup = this.createFormGroup('head_shape', 'Head Shape');
+            const headShapeSelect = this.createSelectElement('head_shape', headShapeOptions);
+            headShapeGroup.appendChild(headShapeSelect);
+            fieldset.appendChild(headShapeGroup);
+            
+            // Face shape
+            const faceShapeGroup = this.createFormGroup('face_shape', 'Face Shape');
+            const faceShapeSelect = this.createSelectElement('face_shape', faceShapeOptions);
+            faceShapeGroup.appendChild(faceShapeSelect);
+            fieldset.appendChild(faceShapeGroup);
+            
+            // Forehead
+            const foreheadGroup = this.createFormGroup('forehead', 'Forehead');
+            const foreheadSelect = this.createSelectElement('forehead', foreheadOptions);
+            foreheadGroup.appendChild(foreheadSelect);
+            fieldset.appendChild(foreheadGroup);
+            
+            // Jawline
+            const jawlineGroup = this.createFormGroup('jawline', 'Jawline');
+            const jawlineSelect = this.createSelectElement('jawline', jawlineOptions);
+            jawlineGroup.appendChild(jawlineSelect);
+            fieldset.appendChild(jawlineGroup);
+            
+            // Cheekbones
+            const cheekbonesGroup = this.createFormGroup('cheekbones', 'Cheekbones');
+            const cheekbonesSelect = this.createSelectElement('cheekbones', cheekbonesOptions);
+            cheekbonesGroup.appendChild(cheekbonesSelect);
+            fieldset.appendChild(cheekbonesGroup);
+            
+        } catch (error) {
+            console.error('Error generating face structure section:', error);
+            fieldset.innerHTML += '<p>Error loading face structure options. Using default values.</p>';
         }
         
         container.appendChild(fieldset);
