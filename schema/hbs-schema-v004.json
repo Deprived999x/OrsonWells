@@ -1,737 +1,754 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Human Builder System Schema",
-  "description": "A comprehensive schema for defining human character parameters for text-to-image systems",
-  "version": "v004",
-  "type": "object",
-  "properties": {
-    "metadata": {
-      "type": "object",
-      "description": "Information about the schema and configuration",
-      "properties": {
-        "version": {
-          "type": "string",
-          "description": "Schema version number",
-          "default": "v004"
-        },
-        "character_name": {
-          "type": "string",
-          "description": "Optional identifier for the character being defined"
-        },
-        "timestamp": {
-          "type": "string",
-          "description": "Creation timestamp in ISO format",
-          "format": "date-time"
-        }
-      }
-    },
-    "gender_conditional_options": {
-      "female_build_options": [
-        "Slender-Female",
-        "Rectangle-Female",
-        "Inverted-Triangle-Female",
-        "Athletic-Female",
-        "Pear-Female",
-        "Hourglass-Female",
-        "Apple-Female",
-        "Curvy-Female",
-        "Stocky-Female",
-        "Plus-Size-Female"
-      ],
-      "male_build_options": [
-        "Lean-Male",
-        "Rectangle-Male",
-        "Athletic-Male",
-        "Hourglass-Male",
-        "V-Shaped-Male",
-        "Muscular-Male",
-        "Stocky-Male",
-        "Endomorph-Male",
-        "Heavyset-Male"
-      ],
-      "female_forehead_options": [
-        "Smooth High",
-        "Gentle Rounded",
-        "Delicate Flat",
-        "Feminine Slope",
-        "Vertical Balanced"
-      ],
-      "male_forehead_options": [
-        "Pronounced High-and-Wide",
-        "Rugged Receding",
-        "Bossed Prominent",
-        "Strong Flat",
-        "Brow-Heavy",
-        "Angled Structural"
-      ],
-      "female_jawline_options": [
-        "Soft Oval",
-        "Delicate Round",
-        "Tapered Heart",
-        "Subtle Defined",
-        "Graceful Wide",
-        "Elegant Pointed"
-      ],
-      "male_jawline_options": [
-        "Strong Square",
-        "Bold Mandibular",
-        "Chiseled Defined",
-        "Broad Wide",
-        "Rugged Round",
-        "Subtle Receding"
-      ],
-      "female_cheekbones_options": [
-        "High-and-Prominent",
-        "Softly-Rounded",
-        "Delicate-Features",
-        "Balanced-Asymmetry",
-        "Dramatic-Contour",
-        "Natural-Flow"
-      ],
-      "male_cheekbones_options": [
-        "Angular-Definition",
-        "Wide-and-Strong",
-        "Sculpted-Look",
-        "Flat-Profile",
-        "Weathered-Character",
-        "Pronounced-Structure"
-      ],
-      "female_eye_shape_options": [
-        "Almond",
-        "Round",
-        "Hooded",
-        "Monolid",
-        "Cat-Eyes",
-        "Wide-Set",
-        "Close-Set"
-      ],
-      "male_eye_shape_options": [
-        "Almond",
-        "Deep-Set",
-        "Hooded",
-        "Monolid",
-        "Narrow",
-        "Wide-Set",
-        "Close-Set"
-      ],
-      "female_eyebrow_shape_options": [
-        "Arched",
-        "Straight",
-        "Rounded",
-        "S-shaped",
-        "Soft-angled",
-        "Curved"
-      ],
-      "male_eyebrow_shape_options": [
-        "Straight",
-        "Flat",
-        "Angular",
-        "Slightly Arched",
-        "Bold Straight",
-        "Natural Line"
-      ],
-      "female_nose_shape_options": [
-        "Straight",
-        "Button",
-        "Celestial",
-        "Roman",
-        "Nubian",
-        "Greek"
-      ],
-      "male_nose_shape_options": [
-        "Straight",
-        "Aquiline",
-        "Roman",
-        "Hawk",
-        "Nubian",
-        "Bulbous",
-        "Snub"
-      ],
-      "female_mouth_options": [
-        "Small",
-        "Medium",
-        "Wide",
-        "Thin",
-        "Upturned",
-        "Downturned",
-        "Bow-shaped"
-      ],
-      "male_mouth_options": [
-        "Medium",
-        "Large",
-        "Wide",
-        "Thin",
-        "Neutral",
-        "Downturned",
-        "Strong-lined"
-      ],
-      "female_lips_options": [
-        "Thin",
-        "Medium",
-        "Full",
-        "Wide",
-        "Bow-shaped",
-        "Round",
-        "Defined",
-        "Asymmetric"
-      ],
-      "male_lips_options": [
-        "Thin",
-        "Medium",
-        "Full",
-        "Wide",
-        "Defined",
-        "Natural",
-        "Asymmetric"
-      ]
-    },
-    "hair_color_options": {
-      "blonde_shades": [
-        "Light Blonde",
-        "Golden Blonde",
-        "Strawberry Blonde",
-        "Medium Blonde",
-        "Ash Blonde",
-        "Dark Blonde"
-      ],
-      "red_shades": [
-        "Bright Red",
-        "Auburn",
-        "Deep Red"
-      ],
-      "brown_shades": [
-        "Light Brown",
-        "Golden Brown",
-        "Ash Brown",
-        "Medium Brown",
-        "Deep Brown"
-      ],
-      "black_shades": [
-        "Soft Black",
-        "Deep Black"
-      ],
-      "gray_white_shades": [
-        "White",
-        "Gray",
-        "Salt and Pepper"
-      ]
-    },
-    "hair_style_length_dependencies": {
-      "buzz_cut_options": [
-        "Buzz Cut",
-        "Bald"
-      ],
-      "ear_length_options": [
-        "Loose Natural",
-        "Pixie Cut",
-        "Undercut",
-        "Pompadour",
-        "Bald"
-      ],
-      "chin_length_options": [
-        "Loose Natural",
-        "Bob Cut",
-        "Braided",
-        "Bald"
-      ],
-      "long_hair_options": [
-        "Loose Natural",
-        "Braided",
-        "Bald"
-      ]
-    },
-    "tails_and_buns_length_dependencies": {
-      "min_required_length": "Shoulder Length",
-      "available_options": [
-        "Ponytail",
-        "High Ponytail",
-        "Low Ponytail",
-        "Side Ponytail",
-        "Pigtails",
-        "Bun",
-        "Classic Bun",
-        "Messy Bun",
-        "Top Knot",
-        "Chignon"
-      ]
-    },
-    "exclusion_rules": {
-      "gender_build_exclusion": {
-        "when": "gender === 'Identify as male'",
-        "prohibited": [
-          "hourglass-female",
-          "pear-female",
-          "apple-female",
-          "rectangle-female",
-          "inverted-triangle-female",
-          "athletic-female",
-          "curvy-female",
-          "slender-female",
-          "plus-size-female",
-          "stocky-female"
-        ]
-      },
-      "eye_modifiers_exclusion": {
-        "mutually_exclusive": [
-          "Upturned",
-          "Downturned"
-        ]
-      },
-      "hair_style_modifiers_exclusion": {
-        "mutually_exclusive": [
-          "Messy",
-          "Neatly Styled"
-        ]
-      },
-      "bald_exclusion": {
-        "when": "hair_style === 'Bald'",
-        "set_to_not_applicable": [
-          "hair_color",
-          "hair_parting",
-          "bangs_fringe",
-          "hair_style_modifiers"
-        ]
-      }
-    },
-    "t2i_parameters": {
-      "type": "object",
-      "description": "All character definition parameters",
-      "properties": {
-        "gender": {
-          "type": "string",
-          "description": "Primary gender classification for character creation",
-          "enum": [
-            "Identify as male",
-            "Identify as female"
-          ]
-        },
-        "visual_heritage": {
-          "type": "string",
-          "description": "Foundational physical characteristics influenced by genetic ancestry",
-          "enum": [
-            "European Heritage",
-            "African Heritage",
-            "East Asian Heritage",
-            "South Asian Heritage",
-            "Southeast Asian Heritage",
-            "Latino Heritage",
-            "Custom Heritage"
-          ]
-        },
-        "age": {
-          "type": "string",
-          "description": "Life stage classifications determining physical development",
-          "enum": [
-            "Pre-adolescent Child",
-            "Teenage Years",
-            "Youthful Adult Appearance",
-            "Mature Adult Features",
-            "Middle-aged Characteristics",
-            "Elderly Senior Traits"
-          ]
-        },
-        "build": {
-          "type": "string",
-          "description": "Physical body structure types"
-        },
-        "height": {
-          "type": "string",
-          "description": "Vertical stature measurement",
-          "enum": [
-            "Very Short",
-            "Short",
-            "Average",
-            "Tall",
-            "Very Tall"
-          ]
-        },
-        "skin_tone": {
-          "type": "string",
-          "description": "Natural human skin color variations",
-          "enum": [
-            "Porcelain Pale Complexion",
-            "Fair Rosy Skin",
-            "Light Beige Tone",
-            "Medium Warm Hue",
-            "Sun-Kissed Tan",
-            "Olive Undertone Skin",
-            "Golden Caramel Shade",
-            "Deep Bronze Coloring",
-            "Rich Mahogany Tone",
-            "Dark Ebony Skin"
-          ]
-        },
-        "skin_texture": {
-          "type": "string",
-          "description": "Surface quality and condition of skin",
-          "enum": [
-            "Flawless Smooth",
-            "Fine-Pored",
-            "Normal Textured",
-            "Matte Finish",
-            "Dewy Fresh",
-            "Weather-Worn",
-            "Line-Detailed",
-            "Textured Mature",
-            "Scarred Character",
-            "Condition-Specific"
-          ]
-        },
-        "head_shape": {
-          "type": "string",
-          "description": "Overall cranial structure forming facial foundation",
-          "enum": [
-            "Oval",
-            "Round",
-            "Square",
-            "Rectangular",
-            "Heart",
-            "Diamond",
-            "Triangle",
-            "Inverted-Triangle",
-            "Long",
-            "Baseball"
-          ]
-        },
-        "face_shape": {
-          "type": "string",
-          "description": "Distinctive facial contour defining overall appearance",
-          "enum": [
-            "Oval",
-            "Round",
-            "Square",
-            "Rectangular",
-            "Heart",
-            "Diamond",
-            "Triangle",
-            "Inverted-Triangle",
-            "Long",
-            "Baseball"
-          ]
-        },
-        "forehead": {
-          "type": "string",
-          "description": "Upper facial feature framing the face"
-        },
-        "jawline": {
-          "type": "string",
-          "description": "Lower facial structure defining face shape"
-        },
-        "cheekbones": {
-          "type": "string",
-          "description": "Facial bone structure influencing width and light dynamics"
-        },
-        "eyes": {
-          "type": "object",
-          "description": "Shape and positioning of eyes",
-          "properties": {
-            "shape": {
-              "type": "string",
-              "description": "Primary eye shape"
-            },
-            "modifiers": {
-              "type": "array",
-              "description": "Additional eye characteristics",
-              "items": {
-                "type": "string",
-                "enum": [
-                  "Upturned",
-                  "Downturned"
-                ]
-              },
-              "maxItems": 1
-            }
-          },
-          "required": ["shape"]
-        },
-        "eye_color": {
-          "type": "string",
-          "description": "Color of the iris",
-          "enum": [
-            "Brown",
-            "Blue",
-            "Green",
-            "Hazel",
-            "Grey",
-            "Other"
-          ]
-        },
-        "eyebrows": {
-          "type": "object",
-          "description": "Facial features framing the eyes",
-          "properties": {
-            "shape": {
-              "type": "string",
-              "description": "Primary eyebrow shape"
-            },
-            "modifiers": {
-              "type": "array",
-              "description": "Additional eyebrow characteristics",
-              "items": {
-                "type": "string",
-                "enum": [
-                  "Bushy",
-                  "Thin",
-                  "Tapered",
-                  "High-set",
-                  "Low-set",
-                  "Feathered",
-                  "Groomed",
-                  "Asymmetric"
-                ]
-              }
-            }
-          },
-          "required": ["shape"]
-        },
-        "nose": {
-          "type": "object",
-          "description": "Central facial feature influencing profile",
-          "properties": {
-            "shape": {
-              "type": "string",
-              "description": "Primary nose shape"
-            },
-            "modifiers": {
-              "type": "array",
-              "description": "Additional nose characteristics",
-              "items": {
-                "type": "string",
-                "enum": [
-                  "Narrow-bridge",
-                  "Wide-base",
-                  "High-bridge",
-                  "Low-bridge",
-                  "Flared-nostrils",
-                  "Narrow-nostrils",
-                  "Rounded-tip",
-                  "Pointed-tip",
-                  "Asymmetric",
-                  "Deviated-septum",
-                  "Upturned"
-                ]
-              }
-            }
-          },
-          "required": ["shape"]
-        },
-        "mouth": {
-          "type": "string",
-          "description": "Facial feature for expression"
-        },
-        "lips": {
-          "type": "string",
-          "description": "Shape and fullness of the lips"
-        },
-        "facial_hair": {
-          "type": "string",
-          "description": "Presence and style of hair growth on the face",
-          "anyOf": [
-            {
-              "enum": ["None", "Clean Shaven"]
-            },
-            {
-              "enum": [
-                "Light Stubble",
-                "Heavy Stubble",
-                "Mustache",
-                "Goatee",
-                "Short Beard",
-                "Full Beard",
-                "Long Beard"
-              ]
-            }
-          ]
-        },
-        "hair_texture": {
-          "type": "string",
-          "description": "Natural surface appearance of hair strands",
-          "enum": [
-            "Straight",
-            "Wavy",
-            "Curly",
-            "Coily",
-            "Kinky"
-          ]
-        },
-        "hair_density": {
-          "type": "string",
-          "description": "Thickness of hair by strand count per area",
-          "enum": [
-            "Fine Density",
-            "Medium Density",
-            "Thick Density"
-          ]
-        },
-        "hair_volume": {
-          "type": "string",
-          "description": "Degree of fullness and body in hairstyle",
-          "enum": [
-            "Flat Volume",
-            "Slight Volume",
-            "Medium Volume",
-            "High Volume",
-            "Voluminous"
-          ]
-        },
-        "hair_length": {
-          "type": "string",
-          "description": "Distance from scalp to hair ends",
-          "enum": [
-            "Buzz Cut",
-            "Ear Length",
-            "Chin Length",
-            "Shoulder Length",
-            "Mid-Back Length",
-            "Waist Length",
-            "Hip Length"
-          ]
-        },
-        "hair_color": {
-          "type": "object",
-          "description": "Dominant shade of the hair",
-          "oneOf": [
-            {
-              "properties": {
-                "color_group": {
-                  "type": "string",
-                  "enum": ["Not Applicable"]
-                }
-              }
-            },
-            {
-              "properties": {
-                "color_group": {
-                  "type": "string",
-                  "enum": [
-                    "Blonde",
-                    "Red",
-                    "Brown",
-                    "Black",
-                    "Gray/White"
-                  ]
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Human Builder System Schema",
+    "description": "A comprehensive schema for defining human character parameters for text-to-image systems",
+    "version": "v004",
+    "type": "object",
+    "properties": {
+        "metadata": {
+            "type": "object",
+            "description": "Information about the schema and configuration",
+            "properties": {
+                "version": {
+                    "type": "string",
+                    "description": "Schema version number",
+                    "default": "v004"
                 },
-                "specific_shade": {
-                  "type": "string"
+                "character_name": {
+                    "type": "string",
+                    "description": "Optional identifier for the character being defined"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "description": "Creation timestamp in ISO format",
+                    "format": "date-time"
                 }
-              },
-              "required": ["color_group", "specific_shade"]
             }
-          ]
         },
-        "hair_parting": {
-          "type": "string",
-          "description": "Positioning of line where hair divides",
-          "enum": [
-            "Center Part",
-            "Side Part",
-            "Deep Side Part",
-            "Zigzag Part",
-            "No Part",
-            "Not Applicable"
-          ]
-        },
-        "bangs_fringe": {
-          "type": "string",
-          "description": "Hair cut short falling across forehead",
-          "enum": [
-            "None",
-            "Blunt Bangs",
-            "Wispy Bangs",
-            "Shaggy Bangs",
-            "Side-Swept Bangs",
-            "Not Applicable"
-          ]
-        },
-        "tails_and_buns": {
-          "type": "string",
-          "description": "Hairstyles with gathered sections secured at specific positions",
-          "enum": [
-            "None",
-            "Ponytail",
-            "High Ponytail",
-            "Low Ponytail",
-            "Side Ponytail",
-            "Pigtails",
-            "Bun",
-            "Classic Bun",
-            "Messy Bun",
-            "Top Knot",
-            "Chignon"
-          ]
-        },
-        "hair_style": {
-          "type": "string",
-          "description": "Other ways the hair is styled and positioned",
-          "enum": [
-            "Loose Natural",
-            "Braided",
-            "Pixie Cut",
-            "Bob Cut",
-            "Undercut",
-            "Pompadour",
-            "Bald"
-          ]
-        },
-        "hair_style_modifiers": {
-          "type": "array",
-          "description": "Additional styling characteristics",
-          "items": {
-            "type": "string",
-            "enum": [
-              "Messy",
-              "Neatly Styled",
-              "Windblown",
-              "Wet Look",
-              "Shiny",
-              "Matte"
+        "gender_conditional_options": {
+            "female_build_options": [
+                "Slender-Female",
+                "Rectangle-Female",
+                "Inverted-Triangle-Female",
+                "Athletic-Female",
+                "Pear-Female",
+                "Hourglass-Female",
+                "Apple-Female",
+                "Curvy-Female",
+                "Stocky-Female",
+                "Plus-Size-Female"
+            ],
+            "male_build_options": [
+                "Lean-Male",
+                "Rectangle-Male",
+                "Athletic-Male",
+                "Hourglass-Male",
+                "V-Shaped-Male",
+                "Muscular-Male",
+                "Stocky-Male",
+                "Endomorph-Male",
+                "Heavyset-Male"
+            ],
+            "female_forehead_options": [
+                "Smooth High",
+                "Gentle Rounded",
+                "Delicate Flat",
+                "Feminine Slope",
+                "Vertical Balanced"
+            ],
+            "male_forehead_options": [
+                "Pronounced High-and-Wide",
+                "Rugged Receding",
+                "Bossed Prominent",
+                "Strong Flat",
+                "Brow-Heavy",
+                "Angled Structural"
+            ],
+            "female_jawline_options": [
+                "Soft Oval",
+                "Delicate Round",
+                "Tapered Heart",
+                "Subtle Defined",
+                "Graceful Wide",
+                "Elegant Pointed"
+            ],
+            "male_jawline_options": [
+                "Strong Square",
+                "Bold Mandibular",
+                "Chiseled Defined",
+                "Broad Wide",
+                "Rugged Round",
+                "Subtle Receding"
+            ],
+            "female_cheekbones_options": [
+                "High-and-Prominent",
+                "Softly-Rounded",
+                "Delicate-Features",
+                "Balanced-Asymmetry",
+                "Dramatic-Contour",
+                "Natural-Flow"
+            ],
+            "male_cheekbones_options": [
+                "Angular-Definition",
+                "Wide-and-Strong",
+                "Sculpted-Look",
+                "Flat-Profile",
+                "Weathered-Character",
+                "Pronounced-Structure"
+            ],
+            "female_eye_shape_options": [
+                "Almond",
+                "Round",
+                "Hooded",
+                "Monolid",
+                "Cat-Eyes",
+                "Wide-Set",
+                "Close-Set"
+            ],
+            "male_eye_shape_options": [
+                "Almond",
+                "Deep-Set",
+                "Hooded",
+                "Monolid",
+                "Narrow",
+                "Wide-Set",
+                "Close-Set"
+            ],
+            "female_eyebrow_shape_options": [
+                "Arched",
+                "Straight",
+                "Rounded",
+                "S-shaped",
+                "Soft-angled",
+                "Curved"
+            ],
+            "male_eyebrow_shape_options": [
+                "Straight",
+                "Flat",
+                "Angular",
+                "Slightly Arched",
+                "Bold Straight",
+                "Natural Line"
+            ],
+            "female_nose_shape_options": [
+                "Straight",
+                "Button",
+                "Celestial",
+                "Roman",
+                "Nubian",
+                "Greek"
+            ],
+            "male_nose_shape_options": [
+                "Straight",
+                "Aquiline",
+                "Roman",
+                "Hawk",
+                "Nubian",
+                "Bulbous",
+                "Snub"
+            ],
+            "female_mouth_options": [
+                "Small",
+                "Medium",
+                "Wide",
+                "Thin",
+                "Upturned",
+                "Downturned",
+                "Bow-shaped"
+            ],
+            "male_mouth_options": [
+                "Medium",
+                "Large",
+                "Wide",
+                "Thin",
+                "Neutral",
+                "Downturned",
+                "Strong-lined"
+            ],
+            "female_lips_options": [
+                "Thin",
+                "Medium",
+                "Full",
+                "Wide",
+                "Bow-shaped",
+                "Round",
+                "Defined",
+                "Asymmetric"
+            ],
+            "male_lips_options": [
+                "Thin",
+                "Medium",
+                "Full",
+                "Wide",
+                "Defined",
+                "Natural",
+                "Asymmetric"
             ]
-          },
-          "allOf": [
-            {
-              "not": {
-                "contains": {
-                  "enum": ["Messy", "Neatly Styled"]
-                }
-              }
+        },
+        "hair_color_options": {
+            "blonde_shades": [
+                "Light Blonde",
+                "Golden Blonde",
+                "Strawberry Blonde",
+                "Medium Blonde",
+                "Ash Blonde",
+                "Dark Blonde"
+            ],
+            "red_shades": [
+                "Bright Red",
+                "Auburn",
+                "Deep Red"
+            ],
+            "brown_shades": [
+                "Light Brown",
+                "Golden Brown",
+                "Ash Brown",
+                "Medium Brown",
+                "Deep Brown"
+            ],
+            "black_shades": [
+                "Soft Black",
+                "Deep Black"
+            ],
+            "gray_white_shades": [
+                "White",
+                "Gray",
+                "Salt and Pepper"
+            ]
+        },
+        "hair_style_length_dependencies": {
+            "buzz_cut_options": [
+                "Buzz Cut",
+                "Bald"
+            ],
+            "ear_length_options": [
+                "Loose Natural",
+                "Pixie Cut",
+                "Undercut",
+                "Pompadour",
+                "Bald"
+            ],
+            "chin_length_options": [
+                "Loose Natural",
+                "Bob Cut",
+                "Braided",
+                "Bald"
+            ],
+            "long_hair_options": [
+                "Loose Natural",
+                "Braided",
+                "Bald"
+            ]
+        },
+        "tails_and_buns_length_dependencies": {
+            "min_required_length": "Shoulder Length",
+            "available_options": [
+                "Ponytail",
+                "High Ponytail",
+                "Low Ponytail",
+                "Side Ponytail",
+                "Pigtails",
+                "Bun",
+                "Classic Bun",
+                "Messy Bun",
+                "Top Knot",
+                "Chignon"
+            ]
+        },
+        "exclusion_rules": {
+            "gender_build_exclusion": {
+                "when": "gender === 'Identify as male'",
+                "prohibited": [
+                    "hourglass-female",
+                    "pear-female",
+                    "apple-female",
+                    "rectangle-female",
+                    "inverted-triangle-female",
+                    "athletic-female",
+                    "curvy-female",
+                    "slender-female",
+                    "plus-size-female",
+                    "stocky-female"
+                ]
+            },
+            "eye_modifiers_exclusion": {
+                "mutually_exclusive": [
+                    "Upturned",
+                    "Downturned"
+                ]
+            },
+            "hair_style_modifiers_exclusion": {
+                "mutually_exclusive": [
+                    "Messy",
+                    "Neatly Styled"
+                ]
+            },
+            "bald_exclusion": {
+                "when": "hair_style === 'Bald'",
+                "set_to_not_applicable": [
+                    "hair_color",
+                    "hair_parting",
+                    "bangs_fringe",
+                    "hair_style_modifiers"
+                ]
             }
-          ]
+        },
+        "t2i_parameters": {
+            "type": "object",
+            "description": "All character definition parameters",
+            "properties": {
+                "gender": {
+                    "type": "string",
+                    "description": "Primary gender classification for character creation",
+                    "enum": [
+                        "Identify as male",
+                        "Identify as female"
+                    ]
+                },
+                "visual_heritage": {
+                    "type": "string",
+                    "description": "Foundational physical characteristics influenced by genetic ancestry",
+                    "enum": [
+                        "European Heritage",
+                        "African Heritage",
+                        "East Asian Heritage",
+                        "South Asian Heritage",
+                        "Southeast Asian Heritage",
+                        "Latino Heritage",
+                        "Custom Heritage"
+                    ]
+                },
+                "age": {
+                    "type": "string",
+                    "description": "Life stage classifications determining physical development",
+                    "enum": [
+                        "Pre-adolescent Child",
+                        "Teenage Years",
+                        "Youthful Adult Appearance",
+                        "Mature Adult Features",
+                        "Middle-aged Characteristics",
+                        "Elderly Senior Traits"
+                    ]
+                },
+                "build": {
+                    "type": "string",
+                    "description": "Physical body structure types"
+                },
+                "height": {
+                    "type": "string",
+                    "description": "Vertical stature measurement",
+                    "enum": [
+                        "Very Short",
+                        "Short",
+                        "Average",
+                        "Tall",
+                        "Very Tall"
+                    ]
+                },
+                "skin_tone": {
+                    "type": "string",
+                    "description": "Natural human skin color variations",
+                    "enum": [
+                        "Porcelain Pale Complexion",
+                        "Fair Rosy Skin",
+                        "Light Beige Tone",
+                        "Medium Warm Hue",
+                        "Sun-Kissed Tan",
+                        "Olive Undertone Skin",
+                        "Golden Caramel Shade",
+                        "Deep Bronze Coloring",
+                        "Rich Mahogany Tone",
+                        "Dark Ebony Skin"
+                    ]
+                },
+                "skin_texture": {
+                    "type": "string",
+                    "description": "Surface quality and condition of skin",
+                    "enum": [
+                        "Flawless Smooth",
+                        "Fine-Pored",
+                        "Normal Textured",
+                        "Matte Finish",
+                        "Dewy Fresh",
+                        "Weather-Worn",
+                        "Line-Detailed",
+                        "Textured Mature",
+                        "Scarred Character",
+                        "Condition-Specific"
+                    ]
+                },
+                "head_shape": {
+                    "type": "string",
+                    "description": "Overall cranial structure forming facial foundation",
+                    "enum": [
+                        "Oval",
+                        "Round",
+                        "Square",
+                        "Rectangular",
+                        "Heart",
+                        "Diamond",
+                        "Triangle",
+                        "Inverted-Triangle",
+                        "Long",
+                        "Baseball"
+                    ]
+                },
+                "face_shape": {
+                    "type": "string",
+                    "description": "Distinctive facial contour defining overall appearance",
+                    "enum": [
+                        "Oval",
+                        "Round",
+                        "Square",
+                        "Rectangular",
+                        "Heart",
+                        "Diamond",
+                        "Triangle",
+                        "Inverted-Triangle",
+                        "Long",
+                        "Baseball"
+                    ]
+                },
+                "forehead": {
+                    "type": "string",
+                    "description": "Upper facial feature framing the face"
+                },
+                "jawline": {
+                    "type": "string",
+                    "description": "Lower facial structure defining face shape"
+                },
+                "cheekbones": {
+                    "type": "string",
+                    "description": "Facial bone structure influencing width and light dynamics"
+                },
+                "eyes": {
+                    "type": "object",
+                    "description": "Shape and positioning of eyes",
+                    "properties": {
+                        "shape": {
+                            "type": "string",
+                            "description": "Primary eye shape"
+                        },
+                        "modifiers": {
+                            "type": "array",
+                            "description": "Additional eye characteristics",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "Upturned",
+                                    "Downturned"
+                                ]
+                            },
+                            "maxItems": 1
+                        }
+                    },
+                    "required": [
+                        "shape"
+                    ]
+                },
+                "eye_color": {
+                    "type": "string",
+                    "description": "Color of the iris",
+                    "enum": [
+                        "Brown",
+                        "Blue",
+                        "Green",
+                        "Hazel",
+                        "Grey",
+                        "Other"
+                    ]
+                },
+                "eyebrows": {
+                    "type": "object",
+                    "description": "Facial features framing the eyes",
+                    "properties": {
+                        "shape": {
+                            "type": "string",
+                            "description": "Primary eyebrow shape"
+                        },
+                        "modifiers": {
+                            "type": "array",
+                            "description": "Additional eyebrow characteristics",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "Bushy",
+                                    "Thin",
+                                    "Tapered",
+                                    "High-set",
+                                    "Low-set",
+                                    "Feathered",
+                                    "Groomed",
+                                    "Asymmetric"
+                                ]
+                            }
+                        }
+                    },
+                    "required": [
+                        "shape"
+                    ]
+                },
+                "nose": {
+                    "type": "object",
+                    "description": "Central facial feature influencing profile",
+                    "properties": {
+                        "shape": {
+                            "type": "string",
+                            "description": "Primary nose shape"
+                        },
+                        "modifiers": {
+                            "type": "array",
+                            "description": "Additional nose characteristics",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "Narrow-bridge",
+                                    "Wide-base",
+                                    "High-bridge",
+                                    "Low-bridge",
+                                    "Flared-nostrils",
+                                    "Narrow-nostrils",
+                                    "Rounded-tip",
+                                    "Pointed-tip",
+                                    "Asymmetric",
+                                    "Deviated-septum",
+                                    "Upturned"
+                                ]
+                            }
+                        }
+                    },
+                    "required": [
+                        "shape"
+                    ]
+                },
+                "mouth": {
+                    "type": "string",
+                    "description": "Facial feature for expression"
+                },
+                "lips": {
+                    "type": "string",
+                    "description": "Shape and fullness of the lips"
+                },
+                "facial_hair": {
+                    "type": "string",
+                    "description": "Presence and style of hair growth on the face",
+                    "anyOf": [
+                        {
+                            "enum": [
+                                "None",
+                                "Clean Shaven"
+                            ]
+                        },
+                        {
+                            "enum": [
+                                "Light Stubble",
+                                "Heavy Stubble",
+                                "Mustache",
+                                "Goatee",
+                                "Short Beard",
+                                "Full Beard",
+                                "Long Beard"
+                            ]
+                        }
+                    ]
+                },
+                "hair_texture": {
+                    "type": "string",
+                    "description": "Natural surface appearance of hair strands",
+                    "enum": [
+                        "Straight",
+                        "Wavy",
+                        "Curly",
+                        "Coily",
+                        "Kinky"
+                    ]
+                },
+                "hair_density": {
+                    "type": "string",
+                    "description": "Thickness of hair by strand count per area",
+                    "enum": [
+                        "Fine Density",
+                        "Medium Density",
+                        "Thick Density"
+                    ]
+                },
+                "hair_volume": {
+                    "type": "string",
+                    "description": "Degree of fullness and body in hairstyle",
+                    "enum": [
+                        "Flat Volume",
+                        "Slight Volume",
+                        "Medium Volume",
+                        "High Volume",
+                        "Voluminous"
+                    ]
+                },
+                "hair_length": {
+                    "type": "string",
+                    "description": "Distance from scalp to hair ends",
+                    "enum": [
+                        "Buzz Cut",
+                        "Ear Length",
+                        "Chin Length",
+                        "Shoulder Length",
+                        "Mid-Back Length",
+                        "Waist Length",
+                        "Hip Length"
+                    ]
+                },
+                "hair_color": {
+                    "type": "object",
+                    "description": "Dominant shade of the hair",
+                    "oneOf": [
+                        {
+                            "properties": {
+                                "color_group": {
+                                    "type": "string",
+                                    "enum": [
+                                        "Not Applicable"
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "properties": {
+                                "color_group": {
+                                    "type": "string",
+                                    "enum": [
+                                        "Blonde",
+                                        "Red",
+                                        "Brown",
+                                        "Black",
+                                        "Gray/White"
+                                    ]
+                                },
+                                "specific_shade": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "color_group",
+                                "specific_shade"
+                            ]
+                        }
+                    ]
+                },
+                "hair_parting": {
+                    "type": "string",
+                    "description": "Positioning of line where hair divides",
+                    "enum": [
+                        "Center Part",
+                        "Side Part",
+                        "Deep Side Part",
+                        "Zigzag Part",
+                        "No Part",
+                        "Not Applicable"
+                    ]
+                },
+                "bangs_fringe": {
+                    "type": "string",
+                    "description": "Hair cut short falling across forehead",
+                    "enum": [
+                        "None",
+                        "Blunt Bangs",
+                        "Wispy Bangs",
+                        "Shaggy Bangs",
+                        "Side-Swept Bangs",
+                        "Not Applicable"
+                    ]
+                },
+                "tails_and_buns": {
+                    "type": "string",
+                    "description": "Hairstyles with gathered sections secured at specific positions",
+                    "enum": [
+                        "None",
+                        "Ponytail",
+                        "High Ponytail",
+                        "Low Ponytail",
+                        "Side Ponytail",
+                        "Pigtails",
+                        "Bun",
+                        "Classic Bun",
+                        "Messy Bun",
+                        "Top Knot",
+                        "Chignon"
+                    ]
+                },
+                "hair_style": {
+                    "type": "string",
+                    "description": "Other ways the hair is styled and positioned",
+                    "enum": [
+                        "Loose Natural",
+                        "Braided",
+                        "Pixie Cut",
+                        "Bob Cut",
+                        "Undercut",
+                        "Pompadour",
+                        "Bald"
+                    ]
+                },
+                "hair_style_modifiers": {
+                    "type": "array",
+                    "description": "Additional styling characteristics",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "Messy",
+                            "Neatly Styled",
+                            "Windblown",
+                            "Wet Look",
+                            "Shiny",
+                            "Matte"
+                        ]
+                    },
+                    "allOf": [
+                        {
+                            "not": {
+                                "contains": {
+                                    "enum": [
+                                        "Messy",
+                                        "Neatly Styled"
+                                    ]
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "gender",
+                "visual_heritage",
+                "age",
+                "build",
+                "height",
+                "skin_tone",
+                "skin_texture",
+                "head_shape",
+                "face_shape",
+                "forehead",
+                "jawline",
+                "cheekbones",
+                "eyes",
+                "eye_color",
+                "eyebrows",
+                "nose",
+                "mouth",
+                "lips",
+                "facial_hair",
+                "hair_texture",
+                "hair_density",
+                "hair_volume",
+                "hair_length",
+                "hair_color",
+                "hair_parting",
+                "bangs_fringe",
+                "tails_and_buns",
+                "hair_style"
+            ]
         }
-      },
-      "required": [
-        "gender",
-        "visual_heritage",
-        "age",
-        "build",
-        "height",
-        "skin_tone",
-        "skin_texture",
-        "head_shape",
-        "face_shape",
-        "forehead",
-        "jawline",
-        "cheekbones",
-        "eyes",
-        "eye_color",
-        "eyebrows",
-        "nose",
-        "mouth",
-        "lips",
-        "facial_hair",
-        "hair_texture",
-        "hair_density",
-        "hair_volume",
-        "hair_length",
-        "hair_color",
-        "hair_parting",
-        "bangs_fringe",
-        "tails_and_buns",
-        "hair_style"
-      ]
-    }
-  },
-  "required": [
-    "metadata",
-    "t2i_parameters"
-  ]
+    },
+    "required": [
+        "metadata",
+        "t2i_parameters"
+    ]
 }
