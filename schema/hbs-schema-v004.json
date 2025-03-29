@@ -13,38 +13,17 @@
           "type": "string",
           "description": "Schema version number",
           "default": "v004"
+        },
+        "character_name": {
+          "type": "string",
+          "description": "Optional identifier for the character being defined"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Creation timestamp in ISO format",
+          "format": "date-time"
         }
-      },
-      "required": [
-        "gender",
-        "visual_heritage",
-        "age",
-        "build",
-        "height",
-        "skin_tone",
-        "skin_texture",
-        "head_shape",
-        "face_shape",
-        "forehead",
-        "jawline",
-        "cheekbones",
-        "eyes",
-        "eye_color",
-        "eyebrows",
-        "nose",
-        "mouth",
-        "lips",
-        "facial_hair",
-        "hair_texture",
-        "hair_density",
-        "hair_volume",
-        "hair_length",
-        "hair_color",
-        "hair_parting",
-        "bangs_fringe",
-        "tails_and_buns",
-        "hair_style"
-      ]
+      }
     },
     "gender_conditional_options": {
       "female_build_options": [
@@ -312,22 +291,6 @@
           "bangs_fringe",
           "hair_style_modifiers"
         ]
-      }
-    }
-  },
-  "required": [
-    "metadata",
-    "t2i_parameters"
-  ],
-        "character_name": {
-          "type": "string",
-          "description": "Optional identifier for the character being defined"
-        },
-        "timestamp": {
-          "type": "string",
-          "description": "Creation timestamp in ISO format",
-          "format": "date-time"
-        }
       }
     },
     "t2i_parameters": {
@@ -724,12 +687,51 @@
               "Matte"
             ]
           },
-          "not": {
-            "contains": {
-              "enum": ["Messy"]
-            },
-            "contains": {
-              "enum": ["Neatly Styled"]
+          "allOf": [
+            {
+              "not": {
+                "contains": {
+                  "enum": ["Messy", "Neatly Styled"]
+                }
+              }
             }
-          }
+          ]
         }
+      },
+      "required": [
+        "gender",
+        "visual_heritage",
+        "age",
+        "build",
+        "height",
+        "skin_tone",
+        "skin_texture",
+        "head_shape",
+        "face_shape",
+        "forehead",
+        "jawline",
+        "cheekbones",
+        "eyes",
+        "eye_color",
+        "eyebrows",
+        "nose",
+        "mouth",
+        "lips",
+        "facial_hair",
+        "hair_texture",
+        "hair_density",
+        "hair_volume",
+        "hair_length",
+        "hair_color",
+        "hair_parting",
+        "bangs_fringe",
+        "tails_and_buns",
+        "hair_style"
+      ]
+    }
+  },
+  "required": [
+    "metadata",
+    "t2i_parameters"
+  ]
+}
