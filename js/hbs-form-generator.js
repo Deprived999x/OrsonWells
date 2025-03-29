@@ -151,3 +151,87 @@ function generateT2IPrompt(characterData, options = {}) {
     if (params.hair_style_modifiers && params.hair_style_modifiers.length > 0) {
       hairDesc += ", " + params.hair_style_modifiers.map(m => m.toLowerCase()).join(" ");
     }
+  } else {
+    promptParts.push("bald");
+  }
+  
+  // Add style suffix if provided
+  if (styleSuffix) {
+    promptParts.push(styleSuffix);
+  }
+  
+  // Combine all parts into a single prompt
+  return promptParts.join(", ");
+}
+
+// Example usage
+/*
+const characterData = {
+  "metadata": {
+    "version": "v004",
+    "character_name": "Sofia Mendez",
+    "timestamp": "2025-03-28T15:30:00Z"
+  },
+  "t2i_parameters": {
+    "gender": "Identify as female",
+    "visual_heritage": "Latino Heritage",
+    "skin_tone": "Sun-Kissed Tan",
+    "skin_texture": "Fine-Pored",
+    "age": "Youthful Adult Appearance",
+    "build": "Athletic-Female",
+    "height": "Average",
+    "head_shape": "Oval",
+    "face_shape": "Heart",
+    "forehead": "Gentle Rounded",
+    "jawline": "Tapered Heart",
+    "cheekbones": "High-and-Prominent",
+    "eyes": {
+      "shape": "Almond",
+      "modifiers": ["Upturned"]
+    },
+    "eye_color": "Brown",
+    "eyebrows": {
+      "shape": "Arched",
+      "modifiers": ["Groomed", "Tapered"]
+    },
+    "nose": {
+      "shape": "Straight",
+      "modifiers": ["Narrow-bridge"]
+    },
+    "mouth": "Medium",
+    "lips": "Full",
+    "facial_hair": "None",
+    "hair_texture": "Wavy",
+    "hair_density": "Thick Density",
+    "hair_volume": "High Volume",
+    "hair_length": "Shoulder Length",
+    "hair_color": {
+      "color_group": "Brown",
+      "specific_shade": "Deep Brown"
+    },
+    "hair_parting": "Side Part",
+    "bangs_fringe": "Side-Swept Bangs",
+    "tails_and_buns": "High Ponytail",
+    "hair_style": "Loose Natural",
+    "hair_style_modifiers": ["Shiny"]
+  }
+};
+
+const options = {
+  includeDetails: true,
+  stylePrefix: "professional portrait photo of a",
+  styleSuffix: "high resolution, detailed features, soft natural lighting"
+};
+
+const prompt = generateT2IPrompt(characterData, options);
+console.log(prompt);
+// Result: "professional portrait photo of a young adult Latino woman with athletic build, with sun-kissed tan skin, heart face, upturned almond brown eyes, groomed tapered arched eyebrows, narro[...]
+*/
+
+// Export the function for both browser and Node.js environments
+if (typeof module !== 'undefined') {
+    module.exports = generateT2IPrompt;
+} else {
+    // Make available globally in browser
+    window.generateT2IPrompt = generateT2IPrompt;
+}
