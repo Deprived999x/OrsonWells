@@ -8,7 +8,7 @@ window.addEventListener('error', function(e) {
 });
 
 // Add copy to clipboard functionality
-document.getElementById('copy-btn').addEventListener('click', () => {
+document.getElementById('copy-btn').addEventListener('click', debounce(() => {
     const promptOutput = document.getElementById('prompt-output');
     navigator.clipboard.writeText(promptOutput.textContent)
         .then(() => {
@@ -21,4 +21,13 @@ document.getElementById('copy-btn').addEventListener('click', () => {
         .catch(err => {
             console.error('Error copying text: ', err);
         });
-});
+}, 300));
+
+// Debounce function to limit the rate at which a function can fire
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
